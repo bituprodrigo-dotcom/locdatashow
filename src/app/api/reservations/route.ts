@@ -103,7 +103,6 @@ export async function POST(req: Request) {
     const docRef = await addDoc(reservationsRef, {
       date: date,
       slots: slots,
-      // @ts-expect-error: session.user.id might not be typed correctly
       userId: session.user.id,
       projectorId: availableProjector.id,
       createdAt: new Date().toISOString()

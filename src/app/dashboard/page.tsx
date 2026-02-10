@@ -63,7 +63,6 @@ export default function DashboardPage() {
     if (status === "unauthenticated") {
       router.push("/login");
     } else if (status === "authenticated") {
-        // @ts-expect-error: check role
         if (session.user.role === "admin") {
             router.push("/dashboard/admin");
         }

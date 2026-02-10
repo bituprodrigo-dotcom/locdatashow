@@ -6,7 +6,7 @@ import { authOptions } from "@/lib/auth";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
-  if (!session) {
+  if (!session || !session.user) {
     return NextResponse.json({ message: "Não autorizado" }, { status: 401 });
   }
 
@@ -66,7 +66,7 @@ export async function GET() {
 
 export async function DELETE(req: Request) {
   const session = await getServerSession(authOptions);
-  if (!session) {
+  if (!session || !session.user) {
     return NextResponse.json({ message: "Não autorizado" }, { status: 401 });
   }
 
@@ -92,7 +92,6 @@ export async function DELETE(req: Request) {
     }
 
     const data = resDoc.data();
-    // @ts-expect-error: data.userId might not be typed correctly
     if (data.userId !== session.user.id) {
       return NextResponse.json(
         { message: "Você não tem permissão para cancelar esta reserva" },

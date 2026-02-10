@@ -7,7 +7,7 @@ import { SCHEDULE_SLOTS } from "@/constants/schedule";
 
 export async function GET(req: Request) {
   const session = await getServerSession(authOptions);
-  if (!session) {
+  if (!session || !session.user) {
     return NextResponse.json({ message: "Não autorizado" }, { status: 401 });
   }
 
@@ -89,13 +89,10 @@ export async function GET(req: Request) {
       };
 
       if (includeDetails) {
-        result.reservations = slotReservations.map(r => ({
-            // @ts-expect-error: r.projector might not be typed correctly
-            projectorName: r.projector.name,
-            // @ts-expect-error: r.user might not be typed correctly
-            userName: r.user.name,
-            // @ts-expect-error: r.area might not be typed correctly
-            userArea: r.area
+        result.reservations = slotReservations.map((r: any) => ({
+            projectorName: r.projector?.name || "Sem nome",
+            userName: r.user?.name || "Usuário desconhecido",
+            userArea: r.area || "N/A"
         }));
       }
 

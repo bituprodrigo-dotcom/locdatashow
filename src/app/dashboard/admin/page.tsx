@@ -62,7 +62,6 @@ export default function AdminDashboard() {
     if (status === "unauthenticated") {
       router.push("/login");
     } else if (status === "authenticated") {
-      // @ts-expect-error: session.user.role check
       if (session.user.role !== "admin") {
         router.push("/dashboard");
       } else {

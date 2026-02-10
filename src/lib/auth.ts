@@ -65,12 +65,9 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user && token.sub) {
-        // @ts-expect-error: session.user.id might not be typed correctly
         session.user.id = token.sub;
-        // @ts-expect-error: session.user.role might not be typed correctly
-        session.user.role = token.role;
-        // @ts-expect-error: session.user.area might not be typed correctly
-        session.user.area = token.area;
+        session.user.role = token.role as string;
+        session.user.area = token.area as string;
       }
       return session;
     },
