@@ -1,4 +1,33 @@
+# locdatashow - Sistema de Reserva de Projetores
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## Configuração do Firebase (IMPORTANTE)
+
+### Configuração das Regras do Firestore
+
+Como este projeto utiliza NextAuth para autenticação no servidor, precisamos configurar o Firestore para aceitar requisições do nosso backend.
+
+1. Acesse o [Firebase Console](https://console.firebase.google.com/)
+2. Selecione seu projeto
+3. Vá para Firestore -> Aba "Regras"
+4. Substitua as regras existentes pelo conteúdo do arquivo `firestore.rules` na raiz do projeto:
+
+```
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
+```
+
+5. Clique em "Publicar" para aplicar as mudanças
+
+**Nota de Segurança**: Estas regras permitem acesso total ao banco de dados. Em produção, você deve implementar regras mais restritivas baseadas em autenticação e autorização apropriadas.
 
 ## Getting Started
 
@@ -34,30 +63,3 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-## Configuração do Firebase
-
-### Configuração das Regras do Firestore
-
-Como este projeto utiliza NextAuth para autenticação no servidor, precisamos configurar o Firestore para aceitar requisições do nosso backend.
-
-1. Acesse o [Firebase Console](https://console.firebase.google.com/)
-2. Selecione seu projeto
-3. Vá para Firestore -> Aba "Regras"
-4. Substitua as regras existentes pelo conteúdo do arquivo `firestore.rules` na raiz do projeto:
-
-```
-rules_version = '2';
-
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true;
-    }
-  }
-}
-```
-
-5. Clique em "Publicar" para aplicar as mudanças
-
-**Nota de Segurança**: Estas regras permitem acesso total ao banco de dados. Em produção, você deve implementar regras mais restritivas baseadas em autenticação e autorização apropriadas.
