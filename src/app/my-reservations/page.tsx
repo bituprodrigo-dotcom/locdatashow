@@ -87,9 +87,9 @@ export default function MyReservationsPage() {
   return (
     <div className="container mx-auto p-4">
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <CardTitle>Minhas Reservas Futuras</CardTitle>
-          <Button variant="outline" onClick={() => router.push("/dashboard")}>
+          <Button variant="outline" className="w-full sm:w-auto" onClick={() => router.push("/dashboard")}>
             Voltar para Dashboard
           </Button>
         </CardHeader>

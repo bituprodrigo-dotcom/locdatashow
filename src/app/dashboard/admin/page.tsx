@@ -132,16 +132,16 @@ export default function AdminDashboard() {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <h1 className="text-3xl font-bold">Painel Administrativo</h1>
-        <div className="space-x-2">
-            <Button variant="outline" onClick={() => router.push("/dashboard")}>Ver como Professor</Button>
-            <Button variant="destructive" onClick={() => signOut({ callbackUrl: "/login" })}>Sair</Button>
+        <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+            <Button variant="outline" className="w-full sm:w-auto" onClick={() => router.push("/dashboard")}>Ver como Professor</Button>
+            <Button variant="destructive" className="w-full sm:w-auto" onClick={() => signOut({ callbackUrl: "/login" })}>Sair</Button>
         </div>
       </div>
 
       <Tabs defaultValue="projectors">
-        <TabsList>
+        <TabsList className="flex-wrap h-auto w-full sm:w-fit justify-start sm:justify-center">
           <TabsTrigger value="projectors">Gerenciar Projetores</TabsTrigger>
           <TabsTrigger value="inventory">Controle de Inventário</TabsTrigger>
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
