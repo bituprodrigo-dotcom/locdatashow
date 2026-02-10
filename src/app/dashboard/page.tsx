@@ -20,6 +20,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Users } from "lucide-react";
 
 interface SlotAvailability {
   slot: number;
@@ -47,6 +56,14 @@ interface ReservationResponse {
     slot?: number;
 }
 
+interface Teacher {
+    id: string;
+    name: string;
+    email: string;
+    area: string;
+    role: string;
+}
+
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -58,6 +75,10 @@ export default function DashboardPage() {
   const [activeReservation, setActiveReservation] = useState<ActiveReservation | null>(null);
   const [countdown, setCountdown] = useState<string | null>(null);
   const [showReturnAlert, setShowReturnAlert] = useState(false);
+  
+  // Teachers list state
+  const [isTeachersOpen, setIsTeachersOpen] = useState(false);
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -115,6 +136,21 @@ export default function DashboardPage() {
           }
       }
   }, []);
+
+  const fetchTeachers = async () => {
+      try {
+          const res = await fetch('/api/users');
+          if (res.ok) {
+              const data = await res.json();
+              setTeachers(data);
+              setIsTeachersOpen(true);
+          } else {
+              toast.error("Erro ao carregar lista de professores");
+          }
+      } catch {
+          toast.error("Erro de conexão");
+      }
+  };
 
   useEffect(() => {
     if (date) {
@@ -293,6 +329,10 @@ export default function DashboardPage() {
            <Button variant="outline" className="w-full" onClick={() => router.push('/my-reservations')}>
              Minhas Reservas
            </Button>
+           <Button variant="outline" className="w-full" onClick={fetchTeachers}>
+             <Users className="mr-2 h-4 w-4" />
+             Professores Registrados
+           </Button>
            <Button variant="secondary" className="w-full" onClick={generatePDF}>
              Baixar Relatório PDF
            </Button>
@@ -381,6 +421,35 @@ export default function DashboardPage() {
               {isLoading ? "Reservando..." : "Confirmar"}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isTeachersOpen} onOpenChange={setIsTeachersOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+                <DialogTitle>Professores Registrados</DialogTitle>
+                <DialogDescription>Lista de todos os professores cadastrados no sistema.</DialogDescription>
+            </DialogHeader>
+            <div className="overflow-x-auto">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Nome</TableHead>
+                            <TableHead>Área</TableHead>
+                            <TableHead>Email</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {teachers.map(teacher => (
+                            <TableRow key={teacher.id}>
+                                <TableCell className="font-medium">{teacher.name}</TableCell>
+                                <TableCell>{teacher.area}</TableCell>
+                                <TableCell className="text-gray-500 text-sm">{teacher.email}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
         </DialogContent>
       </Dialog>
     </div>
