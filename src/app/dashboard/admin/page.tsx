@@ -17,6 +17,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Calendar } from "@/components/ui/calendar";
 import { SCHEDULE_SLOTS } from "@/constants/schedule";
+import { Trash2 } from "lucide-react";
 
 interface Projector {
   id: string;
@@ -29,6 +30,7 @@ interface SlotAvailability {
   availableCount: number;
   totalProjectors: number;
   reservations?: {
+    id: string;
     projectorName: string;
     userName: string;
     userArea?: string;
@@ -127,6 +129,22 @@ export default function AdminDashboard() {
       toast.error("Erro ao excluir projetor");
     }
   };
+
+  const handleCancelReservation = async (id: string) => {
+    if (!confirm("Tem certeza que deseja cancelar esta reserva do usuário?")) return;
+    try {
+        const res = await fetch(`/api/reservations?id=${id}`, { method: "DELETE" });
+        if (res.ok) {
+            toast.success("Reserva cancelada pelo administrador.");
+            fetchOverview();
+        } else {
+             const data = await res.json();
+             toast.error(data.message || "Erro ao cancelar reserva.");
+        }
+    } catch {
+        toast.error("Erro de conexão.");
+    }
+  }
 
   if (status === "loading") return <div>Carregando...</div>;
 
@@ -253,10 +271,21 @@ export default function AdminDashboard() {
                                                     {reservations.length > 0 ? (
                                                         <div className="space-y-1">
                                                             {reservations.map((res, idx) => (
-                                                                <div key={idx} className="text-sm border-b last:border-0 pb-1 last:pb-0">
-                                                                    <span className="font-medium">{res.userName}</span> 
-                                                                    <span className="text-gray-500 text-xs ml-1">({res.userArea})</span>
-                                                                    <span className="block text-xs text-blue-600">↳ {res.projectorName}</span>
+                                                                <div key={idx} className="flex justify-between items-center text-sm border-b last:border-0 pb-1 last:pb-0">
+                                                                    <div>
+                                                                        <span className="font-medium">{res.userName}</span> 
+                                                                        <span className="text-gray-500 text-xs ml-1">({res.userArea})</span>
+                                                                        <span className="block text-xs text-blue-600">↳ {res.projectorName}</span>
+                                                                    </div>
+                                                                    <Button 
+                                                                        variant="ghost" 
+                                                                        size="icon" 
+                                                                        className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                                                        onClick={() => handleCancelReservation(res.id)}
+                                                                        title="Cancelar reserva"
+                                                                    >
+                                                                        <Trash2 size={14} />
+                                                                    </Button>
                                                                 </div>
                                                             ))}
                                                         </div>

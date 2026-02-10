@@ -90,6 +90,7 @@ export async function GET(req: Request) {
 
       if (includeDetails) {
         result.reservations = slotReservations.map((r: any) => ({
+            id: r.id,
             projectorName: r.projector?.name || "Sem nome",
             userName: r.user?.name || "Usuário desconhecido",
             userArea: r.area || "N/A"

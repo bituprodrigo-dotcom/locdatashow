@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firebase";
-import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
+import { collection, query, where, getDocs, addDoc, doc, getDoc, deleteDoc } from "firebase/firestore";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
@@ -111,6 +111,53 @@ export async function POST(req: Request) {
     return NextResponse.json({ id: docRef.id, message: "Reserva realizada com sucesso!" }, { status: 201 });
   } catch (error) {
     console.error("Erro ao criar reserva:", error);
+    return NextResponse.json(
+      { message: "Erro interno do servidor" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) {
+    return NextResponse.json({ message: "Não autorizado" }, { status: 401 });
+  }
+
+  // Check if user is admin
+  if (session.user.role !== "admin") {
+    return NextResponse.json(
+      { message: "Apenas administradores podem realizar esta ação" },
+      { status: 403 }
+    );
+  }
+
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get("id");
+
+  if (!id) {
+    return NextResponse.json(
+      { message: "ID da reserva é obrigatório" },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const resDocRef = doc(db, "reservations", id);
+    const resDoc = await getDoc(resDocRef);
+
+    if (!resDoc.exists()) {
+      return NextResponse.json(
+        { message: "Reserva não encontrada" },
+        { status: 404 }
+      );
+    }
+
+    await deleteDoc(resDocRef);
+
+    return NextResponse.json({ message: "Reserva cancelada com sucesso" });
+  } catch (error) {
+    console.error("Erro ao cancelar reserva (Admin):", error);
     return NextResponse.json(
       { message: "Erro interno do servidor" },
       { status: 500 }
