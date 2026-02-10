@@ -156,31 +156,33 @@ export default function AdminDashboard() {
               </Button>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {projectors.map((proj) => (
-                    <TableRow key={proj.id}>
-                      <TableCell>{proj.name}</TableCell>
-                      <TableCell>{proj.status}</TableCell>
-                      <TableCell className="text-right space-x-2">
-                        <Button variant="outline" size="sm" onClick={() => {
-                          setEditingProjector(proj);
-                          setNewProjectorName(proj.name);
-                          setIsDialogOpen(true);
-                        }}>Editar</Button>
-                        <Button variant="destructive" size="sm" onClick={() => handleDeleteProjector(proj.id)}>Excluir</Button>
-                      </TableCell>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nome</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {projectors.map((proj) => (
+                      <TableRow key={proj.id}>
+                        <TableCell className="whitespace-nowrap">{proj.name}</TableCell>
+                        <TableCell>{proj.status}</TableCell>
+                        <TableCell className="text-right space-x-2 whitespace-nowrap">
+                          <Button variant="outline" size="sm" onClick={() => {
+                            setEditingProjector(proj);
+                            setNewProjectorName(proj.name);
+                            setIsDialogOpen(true);
+                          }}>Editar</Button>
+                          <Button variant="destructive" size="sm" onClick={() => handleDeleteProjector(proj.id)}>Excluir</Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -220,52 +222,54 @@ export default function AdminDashboard() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Horário</TableHead>
-                                    <TableHead>Slot</TableHead>
-                                    <TableHead>Ocupação</TableHead>
-                                    <TableHead>Detalhes (Prof. / Área / Proj.)</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {SCHEDULE_SLOTS.map(slot => {
-                                    const slotData = overviewData.find(d => d.slot === slot.id);
-                                    const reservations = slotData?.reservations || [];
-                                    const isFull = slotData?.availableCount === 0;
+                        <div className="overflow-x-auto">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="whitespace-nowrap">Horário</TableHead>
+                                        <TableHead>Slot</TableHead>
+                                        <TableHead>Ocupação</TableHead>
+                                        <TableHead className="min-w-[200px]">Detalhes (Prof. / Área / Proj.)</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {SCHEDULE_SLOTS.map(slot => {
+                                        const slotData = overviewData.find(d => d.slot === slot.id);
+                                        const reservations = slotData?.reservations || [];
+                                        const isFull = slotData?.availableCount === 0;
 
-                                    return (
-                                        <TableRow key={slot.id} className={isFull ? "bg-red-50" : ""}>
-                                            <TableCell>{slot.startTime} - {slot.endTime}</TableCell>
-                                            <TableCell>{slot.label}</TableCell>
-                                            <TableCell>
-                                                {slotData ? (
-                                                    <span className={isFull ? "text-red-600 font-bold" : "text-green-600"}>
-                                                        {slotData.totalProjectors - slotData.availableCount} / {slotData.totalProjectors}
-                                                    </span>
-                                                ) : "-"}
-                                            </TableCell>
-                                            <TableCell>
-                                                {reservations.length > 0 ? (
-                                                    <div className="space-y-1">
-                                                        {reservations.map((res, idx) => (
-                                                            <div key={idx} className="text-sm border-b last:border-0 pb-1 last:pb-0">
-                                                                <span className="font-medium">{res.userName}</span> 
-                                                                <span className="text-gray-500 text-xs ml-1">({res.userArea})</span>
-                                                                <span className="block text-xs text-blue-600">↳ {res.projectorName}</span>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-gray-400 italic">Sem reservas</span>
-                                                )}
-                                            </TableCell>
-                                        </TableRow>
-                                    );
-                                })}
-                            </TableBody>
-                        </Table>
+                                        return (
+                                            <TableRow key={slot.id} className={isFull ? "bg-red-50" : ""}>
+                                                <TableCell className="whitespace-nowrap">{slot.startTime} - {slot.endTime}</TableCell>
+                                                <TableCell>{slot.label}</TableCell>
+                                                <TableCell>
+                                                    {slotData ? (
+                                                        <span className={isFull ? "text-red-600 font-bold" : "text-green-600"}>
+                                                            {slotData.totalProjectors - slotData.availableCount} / {slotData.totalProjectors}
+                                                        </span>
+                                                    ) : "-"}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {reservations.length > 0 ? (
+                                                        <div className="space-y-1">
+                                                            {reservations.map((res, idx) => (
+                                                                <div key={idx} className="text-sm border-b last:border-0 pb-1 last:pb-0">
+                                                                    <span className="font-medium">{res.userName}</span> 
+                                                                    <span className="text-gray-500 text-xs ml-1">({res.userArea})</span>
+                                                                    <span className="block text-xs text-blue-600">↳ {res.projectorName}</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-gray-400 italic">Sem reservas</span>
+                                                    )}
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })}
+                                </TableBody>
+                            </Table>
+                        </div>
                     </CardContent>
                 </Card>
             </div>

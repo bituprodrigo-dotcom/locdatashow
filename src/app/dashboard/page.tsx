@@ -304,12 +304,12 @@ export default function DashboardPage() {
 
       <div className="w-full md:w-2/3">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <CardTitle>
               Disponibilidade para {date ? format(date, "dd 'de' MMMM", { locale: ptBR }) : "..."}
             </CardTitle>
             {selectedSlots.length > 0 && (
-                <Button onClick={() => setIsConfirmOpen(true)}>
+                <Button onClick={() => setIsConfirmOpen(true)} className="w-full sm:w-auto">
                     Confirmar ({selectedSlots.length} slots)
                 </Button>
             )}

@@ -99,48 +99,50 @@ export default function MyReservationsPage() {
               Você não possui reservas futuras.
             </p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Data</TableHead>
-                  <TableHead>Horários</TableHead>
-                  <TableHead>Projetor</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {reservations.map((reservation) => {
-                  const slots = reservation.slots || []; // Fallback for safety
-                  const slotLabels = slots.map(slotId => {
-                      const s = SCHEDULE_SLOTS.find(sch => sch.id === slotId);
-                      return s ? `${s.label} (${s.startTime})` : `Slot ${slotId}`;
-                  }).join(", ");
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Horários</TableHead>
+                    <TableHead>Projetor</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {reservations.map((reservation) => {
+                    const slots = reservation.slots || []; // Fallback for safety
+                    const slotLabels = slots.map(slotId => {
+                        const s = SCHEDULE_SLOTS.find(sch => sch.id === slotId);
+                        return s ? `${s.label} (${s.startTime})` : `Slot ${slotId}`;
+                    }).join(", ");
 
-                  return (
-                    <TableRow key={reservation.id}>
-                      <TableCell>
-                        {format(new Date(reservation.date), "dd/MM/yyyy", {
-                          locale: ptBR,
-                        })}
-                      </TableCell>
-                      <TableCell>
-                        {slotLabels}
-                      </TableCell>
-                      <TableCell>{reservation.projector.name}</TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleCancelReservation(reservation.id)}
-                        >
-                          Cancelar
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+                    return (
+                      <TableRow key={reservation.id}>
+                        <TableCell className="whitespace-nowrap">
+                          {format(new Date(reservation.date), "dd/MM/yyyy", {
+                            locale: ptBR,
+                          })}
+                        </TableCell>
+                        <TableCell className="min-w-[200px]">
+                          {slotLabels}
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap">{reservation.projector.name}</TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleCancelReservation(reservation.id)}
+                          >
+                            Cancelar
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>
