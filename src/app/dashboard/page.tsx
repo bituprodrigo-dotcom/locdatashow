@@ -28,13 +28,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Users } from "lucide-react";
+import { Users, Trash2 } from "lucide-react";
 
 interface SlotAvailability {
   slot: number;
   availableCount: number;
   totalProjectors: number;
   isReservedByUser: boolean;
+  userReservationId?: string;
   reservations?: {
     projectorName: string;
     userName: string;
@@ -98,9 +99,6 @@ export default function DashboardPage() {
       if (res.ok) {
         const data = await res.json();
         setAvailability(data);
-        
-        // Check for active reservation on selected date (if it's today)
-        // Ideally we should fetch my-reservations separately to find the active one
       }
     } catch {
       toast.error("Erro ao carregar disponibilidade");
@@ -187,12 +185,40 @@ export default function DashboardPage() {
       return () => clearInterval(timer);
   }, [activeReservation]);
 
+  const handleCancelReservation = async (reservationId: string) => {
+      if (!confirm("Tem certeza que deseja cancelar esta reserva?")) return;
+      
+      setIsLoading(true);
+      try {
+          const res = await fetch(`/api/my-reservations?id=${reservationId}`, {
+              method: "DELETE"
+          });
+          
+          if (res.ok) {
+              toast.success("Reserva cancelada com sucesso!");
+              fetchAvailability();
+              fetchActiveReservation();
+          } else {
+              const data = await res.json();
+              toast.error(data.message || "Erro ao cancelar reserva");
+          }
+      } catch {
+          toast.error("Erro de conexão");
+      } finally {
+          setIsLoading(false);
+      }
+  };
+
   const handleSlotClick = (slotId: number) => {
     const slotData = availability.find((s) => s.slot === slotId);
     
     if (slotData?.isReservedByUser) {
-      toast.info("Você já reservou um projetor neste horário.");
-      return;
+        if (slotData.userReservationId) {
+            handleCancelReservation(slotData.userReservationId);
+        } else {
+             toast.info("Você já reservou um projetor neste horário.");
+        }
+        return;
     }
     
     if (slotData && slotData.availableCount === 0) {
@@ -373,6 +399,7 @@ export default function DashboardPage() {
                     key={slot.id}
                     className={`p-4 border rounded-lg cursor-pointer transition-all ${bgColor}`}
                     onClick={() => handleSlotClick(slot.id)}
+                    title={isReserved ? "Clique para cancelar sua reserva" : "Clique para selecionar"}
                   >
                     <div className="flex justify-between items-center mb-2">
                       <span className="font-semibold">{slot.label}</span>
@@ -388,7 +415,7 @@ export default function DashboardPage() {
                           ? "Esgotado"
                           : `${availableCount} de ${total} disponíveis`}
                       </span>
-                      {isReserved && <Badge className="bg-blue-500">Sua Reserva</Badge>}
+                      {isReserved && <Badge className="bg-blue-500 flex items-center gap-1">Sua Reserva <Trash2 className="w-3 h-3 ml-1" /></Badge>}
                       {isSelected && <Badge className="bg-yellow-600">Selecionado</Badge>}
                     </div>
                   </div>

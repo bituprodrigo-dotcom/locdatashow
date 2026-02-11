@@ -80,12 +80,15 @@ export async function GET(req: Request) {
       const availableCount = Math.max(0, totalProjectors - reservedCount);
       // @ts-expect-error: r.userId might not be typed correctly
       const isReservedByUser = slotReservations.some((r) => r.userId === session.user.id);
+      // @ts-expect-error: r.userId might not be typed correctly
+      const userReservation = slotReservations.find((r) => r.userId === session.user.id);
 
       const result: Record<string, unknown> = {
         slot: slot.id,
         availableCount,
         totalProjectors,
         isReservedByUser,
+        userReservationId: userReservation?.id,
       };
 
       if (includeDetails) {
