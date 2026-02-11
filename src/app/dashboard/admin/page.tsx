@@ -238,7 +238,10 @@ export default function AdminDashboard() {
               yPos = 20;
           }
 
-          const dateStr = format(new Date(item.date), "dd/MM");
+          // Fix timezone issue by manually formatting the date string (YYYY-MM-DD)
+          const [year, month, day] = item.date.split('-');
+          const dateStr = `${day}/${month}`;
+          
           const slotsStr = item.slots.map(sid => SCHEDULE_SLOTS.find(s => s.id === sid)?.label).join(", ");
           const profStr = `${item.user.name.substring(0, 20)} (${item.user.area || 'N/A'})`;
           
@@ -508,9 +511,14 @@ export default function AdminDashboard() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {reportResults.map((item, idx) => (
+                                    {reportResults.map((item, idx) => {
+                                        // Fix timezone display issue
+                                        const [y, m, d] = item.date.split('-');
+                                        const dateDisplay = `${d}/${m}/${y}`;
+                                        
+                                        return (
                                         <TableRow key={idx}>
-                                            <TableCell className="whitespace-nowrap">{format(new Date(item.date), "dd/MM/yyyy")}</TableCell>
+                                            <TableCell className="whitespace-nowrap">{dateDisplay}</TableCell>
                                             <TableCell>
                                                 {item.slots.map(s => SCHEDULE_SLOTS.find(slot => slot.id === s)?.label).join(", ")}
                                             </TableCell>
@@ -518,7 +526,7 @@ export default function AdminDashboard() {
                                             <TableCell>{item.user.area}</TableCell>
                                             <TableCell>{item.projector.name}</TableCell>
                                         </TableRow>
-                                    ))}
+                                    )})}
                                 </TableBody>
                             </Table>
                         </div>
