@@ -246,11 +246,18 @@ export default function AdminDashboard() {
           const profStr = `${item.user.name.substring(0, 20)} (${item.user.area || 'N/A'})`;
           
           doc.text(dateStr, 14, yPos);
-          doc.text(slotsStr, 40, yPos);
-          doc.text(profStr, 80, yPos);
+          // Quebra de linha manual para slots se for muito grande
+          const splitSlots = doc.splitTextToSize(slotsStr, 35);
+          doc.text(splitSlots, 40, yPos);
+          
+          const splitProf = doc.splitTextToSize(profStr, 65);
+          doc.text(splitProf, 80, yPos);
+          
           doc.text(item.projector.name, 150, yPos);
           
-          yPos += 8;
+          // Ajusta altura baseado no número de linhas
+          const maxLines = Math.max(splitSlots.length, splitProf.length);
+          yPos += 8 * maxLines;
       });
 
       doc.save("relatorio-reservas.pdf");
