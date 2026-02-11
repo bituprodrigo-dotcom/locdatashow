@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firebase";
-import { collection, query, where, getDocs, addDoc, doc, getDoc, deleteDoc, orderBy } from "firebase/firestore";
+import { collection, query, where, getDocs, addDoc, doc, getDoc, deleteDoc } from "firebase/firestore";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
@@ -46,14 +46,23 @@ export async function POST(req: Request) {
     // 2. Find available projector for ALL requested slots
     // We need a projector that is NOT reserved in ANY of the requested slots
     const projectorsRef = collection(db, "projectors");
-    // Sort by createdAt for FIFO strategy
-    const projectorsQuery = query(projectorsRef, where("status", "==", "disponivel"), orderBy("createdAt"));
+    
+    // FETCH AND SORT IN MEMORY to avoid Firestore Composite Index requirements
+    const projectorsQuery = query(projectorsRef, where("status", "==", "disponivel"));
     const projectorsSnapshot = await getDocs(projectorsQuery);
     
-    const allProjectors = projectorsSnapshot.docs.map(doc => ({
+    let allProjectors = projectorsSnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
-    }));
+    })) as Array<{ id: string; createdAt?: string; [key: string]: any }>;
+
+    // Sort by createdAt (FIFO) - Oldest projectors first
+    // If createdAt is missing (legacy data), treat as oldest (0)
+    allProjectors.sort((a, b) => {
+        const tA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const tB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return tA - tB;
+    });
 
     if (allProjectors.length === 0) {
          return NextResponse.json(

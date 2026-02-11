@@ -23,7 +23,10 @@ export async function GET() {
     ];
 
     for (const proj of initialProjectors) {
-      await addDoc(projectorsRef, proj);
+      await addDoc(projectorsRef, {
+        ...proj,
+        createdAt: new Date().toISOString()
+      });
     }
 
     return NextResponse.json(
