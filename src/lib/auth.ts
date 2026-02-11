@@ -21,15 +21,18 @@ export const authOptions: NextAuthOptions = {
 
         try {
           const usersRef = collection(db, "users");
+          console.log(`[AUTH] Tentando login para: ${email}`);
           const q = query(usersRef, where("email", "==", email), limit(1));
           const querySnapshot = await getDocs(q);
 
           if (querySnapshot.empty) {
+            console.log(`[AUTH] Usuário não encontrado: ${email}`);
             return null;
           }
 
           const userDoc = querySnapshot.docs[0];
           const userData = userDoc.data();
+          console.log(`[AUTH] Usuário encontrado. Comparando senhas...`);
 
           const isPasswordValid = await bcrypt.compare(
             credentials.password,
@@ -37,8 +40,11 @@ export const authOptions: NextAuthOptions = {
           );
 
           if (!isPasswordValid) {
+             console.log(`[AUTH] Senha inválida para: ${email}`);
             return null;
           }
+
+          console.log(`[AUTH] Login bem-sucedido: ${email} (${userData.role})`);
 
           return {
             id: userDoc.id,
