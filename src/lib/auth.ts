@@ -17,9 +17,11 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
+        const email = credentials.email.toLowerCase().trim();
+
         try {
           const usersRef = collection(db, "users");
-          const q = query(usersRef, where("email", "==", credentials.email), limit(1));
+          const q = query(usersRef, where("email", "==", email), limit(1));
           const querySnapshot = await getDocs(q);
 
           if (querySnapshot.empty) {
@@ -75,4 +77,6 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/login",
   },
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === "development",
 };
