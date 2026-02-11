@@ -46,7 +46,8 @@ export async function POST(req: Request) {
     // 2. Find available projector for ALL requested slots
     // We need a projector that is NOT reserved in ANY of the requested slots
     const projectorsRef = collection(db, "projectors");
-    const projectorsQuery = query(projectorsRef, where("status", "==", "disponivel"));
+    // Sort by createdAt for FIFO strategy
+    const projectorsQuery = query(projectorsRef, where("status", "==", "disponivel"), orderBy("createdAt"));
     const projectorsSnapshot = await getDocs(projectorsQuery);
     
     const allProjectors = projectorsSnapshot.docs.map(doc => ({
